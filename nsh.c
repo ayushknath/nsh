@@ -143,14 +143,18 @@ int nsh_execute(char **args) {
 
 void nsh_loop() {
   char *line;
-  char **tokens;
+  char **args;
   int status;
 
   do {
     printf(">> ");
+
     line = read_line();
-    tokens = parse_line(line);
-    status = nsh_execute(tokens);
+    args = parse_line(line);
+    status = nsh_execute(args);
+
+    free(line);
+    free(args);
   } while (status);
 }
 
