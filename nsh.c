@@ -75,28 +75,28 @@ char **parse_line(char *line) {
   return tokens;
 }
 
-int lsh_help(char **args);
-int lsh_exit(char **args);
+int nsh_help(char **args);
+int nsh_exit(char **args);
 
 char *builtin_cmd[] = {"help", "exit"};
-int (*builtin_cmd_fn[])(char **) = {&lsh_help, &lsh_exit};
+int (*builtin_cmd_fn[])(char **) = {&nsh_help, &nsh_exit};
 
-int lsh_builtins() { return sizeof(builtin_cmd) / sizeof(char *); }
+int nsh_builtins() { return sizeof(builtin_cmd) / sizeof(char *); }
 
 // Builtin command functions
-int lsh_help(char **args) {
-  printf("LSH shell - Learning shell\n");
+int nsh_help(char **args) {
+  printf("NSH shell - New shell\n");
   printf("Available builtins: \n");
-  for (int i = 0; i < lsh_builtins(); i++) {
+  for (int i = 0; i < nsh_builtins(); i++) {
     printf("%s\n", builtin_cmd[i]);
   }
 
   return 1;
 }
 
-int lsh_exit(char **args) { return 0; }
+int nsh_exit(char **args) { return 0; }
 
-int lsh_launch(char **args) {
+int nsh_launch(char **args) {
   pid_t pid, wpid;
   int status;
 
@@ -106,11 +106,11 @@ int lsh_launch(char **args) {
     // child process
     int exec_status = execvp(args[0], args);
     if (exec_status == -1) {
-      perror("lsh");
+      perror("nsh");
     }
     exit(EXIT_FAILURE);
   } else if (pid < 0) {
-    perror("lsh");
+    perror("nsh");
   } else {
     // parent process
     do {
@@ -125,23 +125,23 @@ int lsh_launch(char **args) {
   return 1;
 }
 
-int lsh_execute(char **args) {
+int nsh_execute(char **args) {
   if (args[0] == NULL) {
     return 1;
   }
 
   // check for builtin commands
-  for (int i = 0; i < lsh_builtins(); i++) {
+  for (int i = 0; i < nsh_builtins(); i++) {
     if (strcmp(args[0], builtin_cmd[i]) == 0) {
       // execute it
       return (*builtin_cmd_fn[i])(args);
     }
   }
 
-  return lsh_launch(args);
+  return nsh_launch(args);
 }
 
-void lsh_loop() {
+void nsh_loop() {
   char *line;
   char **tokens;
   int status;
@@ -150,12 +150,12 @@ void lsh_loop() {
     printf(">> ");
     line = read_line();
     tokens = parse_line(line);
-    status = lsh_execute(tokens);
+    status = nsh_execute(tokens);
   } while (status);
 }
 
 int main() {
-  lsh_loop();
+  nsh_loop();
 
   return 0;
 }
