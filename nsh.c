@@ -87,10 +87,12 @@ int nsh_builtins() { return sizeof(builtin_cmd) / sizeof(char *); }
 // Builtin command functions
 int nsh_help(char **args) {
   printf("NSH shell - New shell\n");
+  printf("Toy implementation of the Unix shell\n\n");
   printf("Available builtins: \n");
   for (int i = 0; i < nsh_builtins(); i++) {
     printf(" %s\n", builtin_cmd[i]);
   }
+  printf("\nType a command and press enter to execute it\n");
 
   return 1;
 }
