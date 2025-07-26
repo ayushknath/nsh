@@ -12,6 +12,7 @@ char *read_line() {
   int position = 0;
   int buf_size = NSH_RL_BUFSIZE;
   char *buffer = malloc(buf_size * sizeof(char));
+  char *buffer_temp;
 
   if (buffer == NULL) {
     fprintf(stderr, ALLOC_FAIL);
@@ -31,9 +32,11 @@ char *read_line() {
 
     if (position >= buf_size) {
       buf_size += NSH_RL_BUFSIZE;
+      buffer_temp = buffer;
       buffer = realloc(buffer, buf_size * sizeof(char));
 
       if (buffer == NULL) {
+        free(buffer_temp);
         fprintf(stderr, ALLOC_FAIL);
         exit(EXIT_FAILURE);
       }
@@ -49,6 +52,7 @@ char **parse_line(char *line) {
   int tokens_size = NSH_TOK_BUFSIZE;
   char *token;
   char **tokens = malloc(tokens_size * sizeof(char *));
+  char **tokens_backup;
 
   if (tokens == NULL) {
     fprintf(stderr, ALLOC_FAIL);
@@ -63,8 +67,11 @@ char **parse_line(char *line) {
 
     if (position >= tokens_size) {
       tokens_size += NSH_TOK_BUFSIZE;
+      tokens_backup = tokens;
       tokens = realloc(tokens, tokens_size * sizeof(char *));
+
       if (tokens == NULL) {
+        free(tokens_backup);
         fprintf(stderr, ALLOC_FAIL);
         exit(EXIT_FAILURE);
       }
