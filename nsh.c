@@ -148,7 +148,6 @@ void nsh_loop() {
 
   do {
     printf(">> ");
-
     line = read_line();
     args = parse_line(line);
     status = nsh_execute(args);
