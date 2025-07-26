@@ -5,13 +5,12 @@
 #include <unistd.h>
 
 #define ALLOC_FAIL "allocation failure"
-#define TOKEN_DELIM " \t\n"
 
-#define BUF_SIZE 1024
+#define NSH_RL_BUFSIZE 1024
 char *read_line() {
   int c;
   int position = 0;
-  int buf_size = BUF_SIZE;
+  int buf_size = NSH_RL_BUFSIZE;
   char *buffer = malloc(buf_size * sizeof(char));
 
   if (buffer == NULL) {
@@ -31,7 +30,7 @@ char *read_line() {
     position++;
 
     if (position >= buf_size) {
-      buf_size += BUF_SIZE;
+      buf_size += NSH_RL_BUFSIZE;
       buffer = realloc(buffer, buf_size * sizeof(char));
 
       if (buffer == NULL) {
@@ -42,10 +41,12 @@ char *read_line() {
   }
 }
 
-#define TOKENS_SIZE 64
+#define NSH_TOK_BUFSIZE 64
+#define NSH_TOK_DELIM " \t\n"
+
 char **parse_line(char *line) {
   int position = 0;
-  int tokens_size = TOKENS_SIZE;
+  int tokens_size = NSH_TOK_BUFSIZE;
   char *token;
   char **tokens = malloc(tokens_size * sizeof(char *));
 
@@ -54,21 +55,21 @@ char **parse_line(char *line) {
     exit(EXIT_FAILURE);
   }
 
-  token = strtok(line, TOKEN_DELIM);
+  token = strtok(line, NSH_TOK_DELIM);
 
   while (token != NULL) {
     tokens[position] = token;
     position++;
 
     if (position >= tokens_size) {
-      tokens_size += TOKENS_SIZE;
+      tokens_size += NSH_TOK_BUFSIZE;
       tokens = realloc(tokens, tokens_size * sizeof(char *));
       if (tokens == NULL) {
         fprintf(stderr, ALLOC_FAIL);
         exit(EXIT_FAILURE);
       }
     }
-    token = strtok(NULL, TOKEN_DELIM);
+    token = strtok(NULL, NSH_TOK_DELIM);
   }
 
   tokens[position] = NULL;
@@ -88,7 +89,7 @@ int nsh_help(char **args) {
   printf("NSH shell - New shell\n");
   printf("Available builtins: \n");
   for (int i = 0; i < nsh_builtins(); i++) {
-    printf("%s\n", builtin_cmd[i]);
+    printf(" %s\n", builtin_cmd[i]);
   }
 
   return 1;
