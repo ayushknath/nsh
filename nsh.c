@@ -97,7 +97,7 @@ int nsh_help(char **args) {
 int nsh_exit(char **args) { return 0; }
 
 int nsh_launch(char **args) {
-  pid_t pid, wpid;
+  pid_t pid;
   int status;
 
   pid = fork();
@@ -114,7 +114,7 @@ int nsh_launch(char **args) {
   } else {
     // parent process
     do {
-      wpid = waitpid(pid, &status, WUNTRACED);
+      waitpid(pid, &status, WUNTRACED);
     } while (!WIFEXITED(status) && !WIFSIGNALED(status));
   }
 
