@@ -1,3 +1,5 @@
+#include <limits.h>
+#include <pwd.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,6 +8,20 @@
 #include <unistd.h>
 
 #define ALLOC_FAIL "allocation failure"
+#define NSH_USERNAME_CLR "\033[33m"
+#define NSH_HOSTNAME_CLR "\033[32m"
+#define NSH_CLR_RESET "\033[0m"
+
+#ifndef HOST_NAME_MAX
+
+#define HOST_NAME_MAX 256
+
+#endif
+
+typedef struct user_info {
+  struct passwd *username;
+  char hostname[HOST_NAME_MAX + 1];
+} user_info;
 
 char *read_line() {
   char *line = NULL;
@@ -139,9 +155,19 @@ void nsh_loop() {
   char *line;
   char **args;
   int status;
+  user_info info;
+
+  // Get username and hostname
+  info.username = getpwuid(getuid());
+  if (gethostname(info.hostname, sizeof(info.hostname)) != 0) {
+    perror("nsh: hostname");
+    strcpy(info.hostname, "NOT_FOUND");
+  }
 
   do {
-    printf(">> ");
+    printf(NSH_USERNAME_CLR "%s" NSH_CLR_RESET "@" NSH_HOSTNAME_CLR
+                            "%s" NSH_CLR_RESET ">> ",
+           info.username->pw_name, info.hostname);
     line = read_line();
     args = parse_line(line);
     status = nsh_execute(args);
