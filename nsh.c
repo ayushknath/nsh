@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -98,6 +99,9 @@ int nsh_launch(char **args) {
 
   if (pid == 0) {
     // child process
+    if (signal(SIGINT, SIG_DFL) == SIG_ERR) {
+      perror("nsh: signal (child):");
+    }
     int exec_status = execvp(args[0], args);
     if (exec_status == -1) {
       perror("nsh");
@@ -148,6 +152,11 @@ void nsh_loop() {
 }
 
 int main() {
+  // SIGINT: handle SIGINT interrupt
+  if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
+    perror("nsh: signal:");
+  }
+
   nsh_loop();
 
   return 0;
