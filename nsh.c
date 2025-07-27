@@ -6,42 +6,26 @@
 
 #define ALLOC_FAIL "allocation failure"
 
-#define NSH_RL_BUFSIZE 1024
 char *read_line() {
-  int c;
-  int position = 0;
-  int buf_size = NSH_RL_BUFSIZE;
-  char *buffer = malloc(buf_size * sizeof(char));
-  char *buffer_temp;
+  char *line = NULL;
+  size_t line_size = 0;
+  ssize_t line_len;
 
-  if (buffer == NULL) {
-    fprintf(stderr, ALLOC_FAIL);
-    exit(EXIT_FAILURE);
-  }
+  line_len = getline(&line, &line_size, stdin);
 
-  while (1) {
-    c = getchar();
+  if (line_len == -1) {
+    free(line);
 
-    if (c == EOF || c == '\n') {
-      buffer[position] = '\0';
-      return buffer;
-    }
-
-    buffer[position] = c;
-    position++;
-
-    if (position >= buf_size) {
-      buf_size += NSH_RL_BUFSIZE;
-      buffer_temp = buffer;
-      buffer = realloc(buffer, buf_size * sizeof(char));
-
-      if (buffer == NULL) {
-        free(buffer_temp);
-        fprintf(stderr, ALLOC_FAIL);
-        exit(EXIT_FAILURE);
-      }
+    if (feof(stdin) != 0) {
+      puts("\nlogout");
+      exit(EXIT_SUCCESS);
+    } else {
+      perror("nsh: getline\n");
+      exit(EXIT_FAILURE);
     }
   }
+  line[line_len - 1] = '\0';
+  return line;
 }
 
 #define NSH_TOK_BUFSIZE 64
@@ -127,10 +111,6 @@ int nsh_launch(char **args) {
       waitpid(pid, &status, WUNTRACED);
     } while (!WIFEXITED(status) && !WIFSIGNALED(status));
   }
-
-  // debug start
-  // printf("wpid: %d\n", wpid);
-  // debug end
 
   return 1;
 }
