@@ -1,4 +1,4 @@
-# nsh - New shell
+# nsh - Naive shell
 
 nsh is a toy project. It is a custom implementation of the Unix shell for learning purposes.
 
